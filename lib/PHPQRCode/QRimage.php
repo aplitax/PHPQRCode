@@ -30,7 +30,9 @@ class QRimage {
     public static function png($frame, $filename = false, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE)
     {
         $image = self::image($frame, $pixelPerPoint, $outerFrame);
-
+        
+        imagetruecolortopalette($image, false, 255);
+        
         if ($filename === false) {
             Header("Content-type: image/png");
             ImagePng($image);
@@ -63,7 +65,7 @@ class QRimage {
     }
 
     //----------------------------------------------------------------------
-    public static function image($frame, $pixelPerPoint = 4, $outerFrame = 4)
+    private static function image($frame, $pixelPerPoint = 4, $outerFrame = 4)
     {
         $h = count($frame);
         $w = strlen($frame[0]);
@@ -71,12 +73,17 @@ class QRimage {
         $imgW = $w + 2*$outerFrame;
         $imgH = $h + 2*$outerFrame;
 
-        $base_image =ImageCreate($imgW, $imgH);
+        $base_image = imagecreatetruecolor($imgW, $imgH);
 
-        $col[0] = ImageColorAllocate($base_image,255,255,255);
+        $col[0] = ImageColorAllocate($base_image,255,0,255);
         $col[1] = ImageColorAllocate($base_image,0,0,0);
 
-        imagefill($base_image, 0, 0, $col[0]);
+        imagecolortransparent($base_image, $col[0]);
+        imagealphablending($base_image, true);
+        imagesavealpha($base_image, true);
+//        imagefill($base_image, 0, 0, $col[0]);
+
+        imagefill($base_image, 0, 0, 0x7fff0000);
 
         for($y=0; $y<$h; $y++) {
             for($x=0; $x<$w; $x++) {
